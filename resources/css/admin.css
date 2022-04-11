@@ -1,0 +1,11 @@
+@import "rc-time-picker/assets/index.css";
+
+.page-sidebar {
+  background-image: none;
+  background-color: #111;
+}
+
+.page-logo {
+  background-image: none;
+  background-color: transparent;
+}
