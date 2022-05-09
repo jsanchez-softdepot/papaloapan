@@ -1,6 +1,7 @@
 import React from "react";
 import AdminLayout from "@/Layouts/AdminLayout";
 import { Link } from "@inertiajs/inertia-react";
+import Pagination from "@/Components/Pagination";
 
 export default function Dashboard(props) {
   return (
@@ -29,11 +30,12 @@ export default function Dashboard(props) {
                       <th>Email</th>
                       <th>Teléfono</th>
                       <th>Rol</th>
+                      <th>Acciones</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {props.users.length > 0 &&
-                      props.users.map((item, index) => {
+                    {props.users.data.length > 0 &&
+                      props.users.data.map((item, index) => {
                         return (
                           <tr key={index.toString()}>
                             <td>{item.id}</td>
@@ -42,11 +44,24 @@ export default function Dashboard(props) {
                             <td>{item.email}</td>
                             <td>{item.phone}</td>
                             <td>{item.roles.length > 0 && item.roles.map((item, index) => item.name)}</td>
+                            <td>
+                              {!item.roles.find((r) => r.name === "superadmin") && (
+                                <Link as="button" method="delete" className="btn btn-sm btn-danger" href={route("admin.users.destroy", item.id)}>
+                                  <i className="fal fa-trash"></i>
+                                </Link>
+                              )}
+
+                              <Link className="btn btn-sm btn-info" href={route("admin.users.edit", item.id)}>
+                                <i className="fal fa-pencil"></i>
+                              </Link>
+                            </td>
                           </tr>
                         );
                       })}
                   </tbody>
                 </table>
+
+                <Pagination links={props.users.links} />
               </div>
             </div>
           </div>

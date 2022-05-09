@@ -69,6 +69,9 @@ class Order extends Model
         return "Entregado";
         break;
       case 4:
+        return "Finalizado";
+        break;
+      case 99:
         return "Cancelado";
         break;
     }
@@ -90,6 +93,9 @@ class Order extends Model
         return "success";
         break;
       case 4:
+        return "dark";
+        break;
+      case 99:
         return "danger";
         break;
     }

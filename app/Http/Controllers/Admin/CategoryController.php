@@ -12,6 +12,10 @@ use Inertia\Inertia;
 
 class CategoryController extends Controller
 {
+  public function __construct()
+  {
+    $this->middleware(["role:superadmin", "permission:create category|read category|edit category|update category|delete category"]);
+  }
   /**
    * Display a listing of the resource.
    *

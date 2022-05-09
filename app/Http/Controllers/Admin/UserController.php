@@ -3,15 +3,23 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\UserResource;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 use Spatie\Permission\Models\Role;
 use Throwable;
 
 class UserController extends Controller
 {
+  public function __construct()
+  {
+    $this->middleware(["role:superadmin", "permission:create user|read user|edit user|update user|delete user"]);
+  }
+
   /**
    * Display a listing of the resource.
    *
@@ -20,7 +28,7 @@ class UserController extends Controller
   public function index()
   {
     $breadcrumbs = [["url" => route("admin.index"), "name" => "Dashboard"], ["url" => route("admin.users.index"), "name" => "Usuarios"]];
-    $users = User::all();
+    $users = User::orderBy("created_at", "ASC")->paginate(100);
     $roles = Role::all();
 
     $users->load(["roles"]);
@@ -74,7 +82,7 @@ class UserController extends Controller
       $u->lastname = $request->input("lastname");
       $u->email = $request->input("email");
       $u->phone = $request->input("phone");
-      $u->password = $request->input("password");
+      $u->password = bcrypt($request->input("password"));
       $u->save();
 
       $u->assignRole($request->input("role"));
@@ -104,7 +112,20 @@ class UserController extends Controller
    */
   public function edit(User $user)
   {
-    //
+    $breadcrumbs = [
+      ["url" => route("admin.index"), "name" => "Dashboard"],
+      ["url" => route("admin.users.index"), "name" => "Usuarios"],
+      ["url" => route("admin.users.edit", $user->id), "name" => "Editar Usuario"],
+    ];
+
+    $roles = Role::all();
+
+    $user->load(["roles"]);
+
+    return Inertia::render("Admin/Users/UserEdit")
+      ->with("breadcrumbs", $breadcrumbs)
+      ->with("roles", $roles)
+      ->with("user", $user);
   }
 
   /**
@@ -116,7 +137,36 @@ class UserController extends Controller
    */
   public function update(Request $request, User $user)
   {
-    //
+    if (Auth::user()->can("update user")) {
+      $request->validate([
+        "name" => "required",
+        "role" => "required",
+        "lastname" => "required",
+        "email" => ["sometimes", "required", "email", Rule::unique("users")->ignore($user->id)],
+        "password" => "sometimes|confirmed",
+      ]);
+
+      $user->update([
+        "name" => $request->input("name"),
+        "lastname" => $request->input("lastname"),
+        "phone" => $request->input("phone"),
+        "email" => $request->input("email"),
+        "password" => bcrypt($request->input("password")),
+        "send_notifications" => $user->send_notifications,
+      ]);
+
+      if ($request->filled("password") && $request->filled("password_confirmation")) {
+        $user->password = bcrypt($request->input("password"));
+      }
+
+      $user->roles()->detach();
+
+      $user->assignRole($request->input("role"));
+
+      return redirect()->back();
+    } else {
+      return response("not authorized", 403);
+    }
   }
 
   /**
@@ -127,6 +177,10 @@ class UserController extends Controller
    */
   public function destroy(User $user)
   {
-    //
+    if (Auth::user()->can("delete user")) {
+      $user->delete();
+    }
+
+    return redirect()->back();
   }
 }

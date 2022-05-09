@@ -2,8 +2,11 @@ import FlashAlert from "@/Components/FlashAlert";
 import AdminLayout from "@/Layouts/AdminLayout";
 import { Link } from "@inertiajs/inertia-react";
 import numeral from "numeral";
-import React from "react";
+import React, { useState } from "react";
 import { format } from "date-fns";
+import Swal from "sweetalert2";
+import { Inertia } from "@inertiajs/inertia";
+import toast from "react-hot-toast";
 
 const ConektaPaymentRow = ({ paymentObj }) => {
   return (
@@ -30,16 +33,246 @@ const CashPaymentRow = ({ paymentObj }) => {
 };
 
 export default function OrderDetail(props) {
+  const [showPaymentForm, setShowPaymentForm] = useState(false);
+  const [newPaymentMethod, setNewPaymentMethod] = useState("1");
+  const [newPaymentAuthCode, setNewPaymentAuthCode] = useState("");
+  const [newPaymentInfo, setNewPaymentInfo] = useState("");
+
+  const _handleApprovePayment = () => {
+    Swal.fire({
+      icon: "question",
+      title: "Confirmar",
+      text: "¿Desea marcar este pedido como pagado?",
+      confirmButtonText: "Sí, continuar",
+      cancelButtonText: "Cancelar",
+      showConfirmButton: true,
+      showCancelButton: true,
+    }).then((rslt) => {
+      if (rslt.isConfirmed) {
+        const newPayment = {
+          order: props.order.id,
+          authcode: newPaymentAuthCode,
+          method: newPaymentMethod,
+          info: newPaymentInfo,
+        };
+
+        console.log(newPayment);
+
+        Inertia.post(route("admin.payments.manual"), newPayment, {
+          onSuccess: () => {
+            setShowPaymentForm(false);
+            setNewPaymentAuthCode("");
+            setNewPaymentInfo("");
+
+            toast.success("Pago acreditado correctamente", { position: "top-right" });
+          },
+        });
+
+        /*
+        api
+          .post(route('admin.payments.manual'), newPayment)
+          .then((rsp) => {
+            console.log(rsp.data);
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+          */
+      }
+    });
+  };
+
+  const _handleNextStatus = (e) => {
+    e.preventDefault();
+    Inertia.patch(
+      route("admin.orders.update", props.order.id),
+      {
+        nextStatus: true,
+      },
+      {
+        onSuccess: () => {
+          toast.success("Estatus actualizado correctamente", { position: "top-right" });
+        },
+      }
+    );
+
+    /**
+    api
+      .post(`/orders/${currentOrder.id}`, {
+        _method: "PATCH",
+        nextStatus: true,
+      })
+      .then((rsp) => {
+        console.log(rsp.data);
+        setCurrentOrder(rsp.data);
+      })
+      .catch((err) => {
+        console.log(err);
+      })
+      .finally(() => {
+        getOrders();
+      });
+     */
+  };
+
+  const _handleCancelOrder = (e) => {
+    e.preventDefault();
+
+    Swal.fire({
+      icon: "question",
+      title: "Confirmar",
+      text: "¿Desea cancelar este pedido?",
+      confirmButtonText: "Sí, cancelar",
+      cancelButtonText: "No",
+      showConfirmButton: true,
+      showCancelButton: true,
+    }).then((rslt) => {
+      if (rslt.isConfirmed) {
+        Inertia.patch(
+          route("admin.orders.update", props.order.id),
+          {
+            cancelOrder: true,
+          },
+          {
+            onSuccess: () => {
+              toast.success("Orden cancelada correctamente", { position: "top-right" });
+            },
+          }
+        );
+        /**
+         * 
+        api
+          .post(`/orders/${currentOrder.id}`, {
+            _method: "PATCH",
+            cancelOrder: true,
+          })
+          .then((rsp) => {
+            console.log(rsp.data);
+            setCurrentOrder(rsp.data);
+          })
+          .catch((err) => {
+            console.log(err);
+          })
+          .finally(() => {
+            getOrders();
+          });
+          
+         */
+      }
+    });
+  };
+
   return (
     <AdminLayout
       auth={props.auth}
       errors={props.errors}
       breadcrumbs={props.breadcrumbs}
-      header={{ title: "Pedido" + props.order.consecutive, subtitle: "Detalle de pedido", icon: "th-list" }}
+      header={{ title: "Pedido " + props.order.consecutive, subtitle: "Detalle de pedido", icon: "th-list" }}
     >
       {props.flash.error && <FlashAlert message={props.flash.error} type="error" />}
       {props.flash.success && <FlashAlert message={props.flash.success} type="success" />}
       {props.flash.info && <FlashAlert message={props.flash.info} type="info" />}
+
+      <div className="row mb-3">
+        <div className="col-md-4 col-lg-2 text-center">
+          <button
+            className="btn btn-primary btn-lg btn-block"
+            type="button"
+            onClick={(e) => {
+              e.preventDefault();
+              setShowPaymentForm(true);
+            }}
+          >
+            Acreditar Pago
+          </button>
+        </div>
+
+        <div className="col-md-4 col-lg-2 text-center">
+          <div className="btn-group btn-block">
+            <button
+              type="button"
+              className={`btn btn-block btn-lg btn-${props.order.status_color} dropdown-toggle`}
+              data-toggle="dropdown"
+              aria-haspopup="true"
+              aria-expanded="false"
+            >
+              {props.order.status_text}
+            </button>
+            <div className="dropdown-menu">
+              <a className="dropdown-item" href="#" onClick={_handleNextStatus}>
+                {Number(props.order.status) === 0 ? "Confirmado" : ""}
+                {Number(props.order.status) === 1 ? "En Camino" : ""}
+                {Number(props.order.status) === 2 ? "Entregado" : ""}
+                {Number(props.order.status) === 3 ? "Pedido Finalizado" : ""}
+              </a>
+              <a href="#" onClick={_handleCancelOrder} className="dropdown-item">
+                Cancelar
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {showPaymentForm && (
+        <>
+          <div className="card shadow mb-3">
+            <div className="card-body">
+              <div className="form">
+                <div className="row">
+                  <div className="col-lg-3">
+                    <label>Método de Pago</label>
+                    <select
+                      name="payment_method"
+                      className="form-control"
+                      onChange={(e) => {
+                        setNewPaymentMethod(e.target.value);
+                      }}
+                      value={newPaymentMethod}
+                    >
+                      <option value="1">Tarjeta de Crédito</option>
+                      <option value="2">Efectivo / Contra Entrega</option>
+                    </select>
+                  </div>
+                  <div className="col-lg-3">
+                    <label>Código de Autorización</label>
+                    <input
+                      type="text"
+                      className="form-control"
+                      value={newPaymentAuthCode}
+                      onChange={(e) => {
+                        setNewPaymentAuthCode(e.target.value);
+                      }}
+                    />
+                  </div>
+                  <div className="col-lg-3">
+                    <label>Información</label>
+                    <input
+                      type="text"
+                      className="form-control"
+                      value={newPaymentInfo}
+                      onChange={(e) => {
+                        setNewPaymentInfo(e.target.value);
+                      }}
+                    />
+                  </div>
+                  <div className="col-lg-3">
+                    <label className="d-block">&nbsp;</label>
+                    <button
+                      onClick={(e) => {
+                        e.preventDefault();
+                        _handleApprovePayment();
+                      }}
+                      className="btn btn-success"
+                    >
+                      Guardar
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </>
+      )}
 
       <div className="row">
         <div className="col-md-4">

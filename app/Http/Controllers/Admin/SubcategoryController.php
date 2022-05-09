@@ -12,6 +12,11 @@ use Inertia\Inertia;
 
 class SubcategoryController extends Controller
 {
+  public function __construct()
+  {
+    $this->middleware(["role:superadmin", "permission:create subcategory|read subcategory|edit subcategory|update subcategory|delete subcategory"]);
+  }
+
   /**
    * Display a listing of the resource.
    *

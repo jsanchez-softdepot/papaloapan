@@ -11,6 +11,11 @@ use Inertia\Inertia;
 
 class ConfigurationController extends Controller
 {
+  public function __construct()
+  {
+    $this->middleware(["role:superadmin", "permission:create config|read config|edit config|update config|delete config"]);
+  }
+
   public function costos()
   {
     $configuration = Configuration::where("code", "costos")->get();

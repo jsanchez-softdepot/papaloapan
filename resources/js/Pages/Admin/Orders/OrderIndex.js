@@ -1,4 +1,5 @@
 import FlashAlert from "@/Components/FlashAlert";
+import Pagination from "@/Components/Pagination";
 import AdminLayout from "@/Layouts/AdminLayout";
 import { Link } from "@inertiajs/inertia-react";
 import numeral from "numeral";
@@ -59,6 +60,8 @@ export default function OrderIndex(props) {
                       })}
                   </tbody>
                 </table>
+
+                <Pagination links={props.orders.meta.links} />
               </div>
             </div>
           </div>

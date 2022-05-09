@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\ConfigurationController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\OrderController as AdminOrderController;
+use App\Http\Controllers\Admin\PaymentController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\SubcategoryController;
@@ -52,9 +53,11 @@ Route::middleware(["auth"])
     Route::get("products/import", [ProductController::class, "import"])->name("products.import");
     Route::post("products/import", [ProductController::class, "postImport"])->name("products.postImport");
 
+    Route::post("payments", [PaymentController::class, "manualPayment"])->name("payments.manual");
+
     Route::resource("orders", AdminOrderController::class);
     Route::resource("users", UserController::class);
-    Route::resource("roles", RoleController::class);
+    Route::resource("roles", RoleController::class)->except(["show", "edit", "update"]);
     Route::resource("products", ProductController::class);
     Route::resource("categories", CategoryController::class);
     Route::resource("subcategories", SubcategoryController::class);
@@ -82,6 +85,7 @@ require __DIR__ . "/auth.php";
 Route::post("zipcodes/searchvalidate", [ZipCodeController::class, "searchValidate"])->name("zipcode.validate");
 
 Route::name("profile.")
+  ->middleware(["auth"])
   ->prefix("mi-cuenta")
   ->group(function () {
     Route::get("/", [ProfileController::class, "account"])->name("account.index");

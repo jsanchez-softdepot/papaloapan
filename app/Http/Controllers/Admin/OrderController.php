@@ -5,11 +5,16 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\OrderResource;
 use App\Models\Order;
+use App\Notifications\OrderDelivered;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class OrderController extends Controller
 {
+  public function __construct()
+  {
+    $this->middleware(["role:superadmin", "permission:create order|read order|edit order|update order|delete order"]);
+  }
   /**
    * Display a listing of the resource.
    *
@@ -74,7 +79,33 @@ class OrderController extends Controller
    */
   public function update(Request $request, Order $order)
   {
-    //
+    if ($request->input("nextStatus")) {
+      $newStatus = $order->status + 1;
+      $order->status = $newStatus;
+
+      if ($newStatus === 1) {
+        $order->confirmed_at = now();
+      }
+
+      if ($newStatus === 3) {
+        $oUser = $order->user;
+        if ($oUser !== null) {
+          $oUser->notify(new OrderDelivered($order));
+        }
+      }
+
+      if ($newStatus === 4) {
+        $order->completed_at = now();
+      }
+    }
+
+    if ($request->input("cancelOrder")) {
+      $order->status = 99;
+    }
+
+    $order->save();
+
+    return redirect()->back();
   }
 
   /**

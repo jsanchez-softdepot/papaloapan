@@ -5,7 +5,11 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Spatie\Permission\Models\Role;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
+use Spatie\Permission\Models\Permission;
+use Throwable;
 
 class RoleController extends Controller
 {
@@ -17,12 +21,9 @@ class RoleController extends Controller
   public function index()
   {
     $roles = Role::all();
+    $roles->load(["permissions"]);
 
-    $breadcrumbs = [
-      ["url" => route("admin.index"), "name" => "Dashboard"],
-      ["url" => route("admin.users.index"), "name" => "Usuarios"],
-      ["url" => route("admin.users.create"), "name" => "Crear"],
-    ];
+    $breadcrumbs = [["url" => route("admin.index"), "name" => "Dashboard"], ["url" => route("admin.roles.index"), "name" => "Roles"]];
 
     return Inertia::render("Admin/Roles/RoleIndex")
       ->with("roles", $roles)
@@ -36,7 +37,16 @@ class RoleController extends Controller
    */
   public function create()
   {
-    //
+    $permissions = Permission::all();
+    $breadcrumbs = [
+      ["url" => route("admin.index"), "name" => "Dashboard"],
+      ["url" => route("admin.roles.index"), "name" => "Roles"],
+      ["url" => route("admin.roles.create"), "name" => "Crear Rol"],
+    ];
+
+    return Inertia::render("Admin/Roles/RoleCreate")
+      ->with("permissions", $permissions)
+      ->with("breadcrumbs", $breadcrumbs);
   }
 
   /**
@@ -47,41 +57,27 @@ class RoleController extends Controller
    */
   public function store(Request $request)
   {
-    //
-  }
+    $request->validate([
+      "name" => ["required", "unique:roles"],
+      "permissions" => ["array"],
+    ]);
 
-  /**
-   * Display the specified resource.
-   *
-   * @param  \Spatie\Permission\Models\Role  $role
-   * @return \Illuminate\Http\Response
-   */
-  public function show(Role $role)
-  {
-    //
-  }
+    DB::beginTransaction();
 
-  /**
-   * Show the form for editing the specified resource.
-   *
-   * @param  \Spatie\Permission\Models\Role  $role
-   * @return \Illuminate\Http\Response
-   */
-  public function edit(Role $role)
-  {
-    //
-  }
+    try {
+      $r = new Role();
+      $r->name = $request->input("name");
+      $r->save();
 
-  /**
-   * Update the specified resource in storage.
-   *
-   * @param  \Illuminate\Http\Request  $request
-   * @param  \Spatie\Permission\Models\Role  $role
-   * @return \Illuminate\Http\Response
-   */
-  public function update(Request $request, Role $role)
-  {
-    //
+      $r->givePermissionTo($request->input("permissions"));
+
+      DB::commit();
+    } catch (Throwable $e) {
+      DB::rollBack();
+      Log::info($e->getMessage());
+    }
+
+    return redirect()->route("admin.roles.index");
   }
 
   /**
@@ -92,6 +88,8 @@ class RoleController extends Controller
    */
   public function destroy(Role $role)
   {
-    //
+    $role->delete();
+
+    return redirect()->back();
   }
 }

@@ -2,23 +2,28 @@ import React, { useState } from "react";
 import AdminLayout from "@/Layouts/AdminLayout";
 import { Inertia } from "@inertiajs/inertia";
 import { useForm } from "@inertiajs/inertia-react";
+import toast from "react-hot-toast";
 
-export default function UserCreate(props) {
-  const { post, errors, data, setData, processing } = useForm({
-    name: "",
-    lastname: "",
-    email: "",
-    phone: "",
-    is_admin: "0",
+export default function UserEdit(props) {
+  const { patch, errors, data, setData, processing } = useForm({
+    name: props.user.name,
+    lastname: props.user.lastname,
+    email: props.user.email,
+    phone: props.user.phone,
+    is_admin: props.user.is_admin,
     password: "",
     password_confirmation: "",
-    role: "0",
+    role: props.user.roles[0].id,
   });
 
   const _handleSubmit = (e) => {
     e.preventDefault();
 
-    post(route("admin.users.store"));
+    patch(route("admin.users.update", props.user.id), {
+      onSuccess: () => {
+        toast.success("Datos actualizados correctamente");
+      },
+    });
   };
 
   return (

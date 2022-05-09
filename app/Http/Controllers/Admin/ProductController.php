@@ -19,6 +19,11 @@ use Illuminate\Support\Facades\Auth;
 
 class ProductController extends Controller
 {
+  public function __construct()
+  {
+    $this->middleware(["role:superadmin", "permission:create product|read product|edit product|update product|delete product"]);
+  }
+
   /**
    * Display a listing of the resource.
    *
