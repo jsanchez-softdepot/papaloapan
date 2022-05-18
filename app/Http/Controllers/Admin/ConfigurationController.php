@@ -3,17 +3,65 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\ConfigResource;
 use App\Http\Resources\SlideResource;
 use App\Models\Configuration;
 use App\Models\Slide;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Illuminate\Support\Str;
 
 class ConfigurationController extends Controller
 {
   public function __construct()
   {
     $this->middleware(["role:superadmin", "permission:create config|read config|edit config|update config|delete config"]);
+  }
+
+  public function store(Request $request)
+  {
+    $request->validate([
+      "name" => "required",
+      "value" => "required",
+    ]);
+
+    $config = Configuration::firstOrNew(["name" => $request->input("name")]);
+    $config->name = $request->input("name");
+    $config->code = Str::slug($request->input("name"));
+    $config->value = $request->input("value");
+    $config->save();
+
+    return response("success", 200);
+  }
+
+  public function privacyShow(Request $request)
+  {
+    $configPrivacy = Configuration::where("name", "privacy_content")->firstOrCreate();
+    $configTerms = Configuration::where("name", "terms_content")->firstOrCreate();
+    return Inertia::render("Admin/Configuration/Privacy")
+      ->with("privacy_content", $configPrivacy->value)
+      ->with("terms_content", $configTerms->value);
+  }
+
+  public function privacyUpdate(Request $request)
+  {
+    $request->validate(["privacyContent" => "required", "termsContent" => "required"]);
+
+    $config = Configuration::firstOrNew(["name" => "privacy_content"]);
+    $config->name = "privacy_content";
+    $config->code = "privacy_content";
+    $config->value = $request->input("privacyContent");
+    $config->save();
+
+    $config = Configuration::firstOrNew(["name" => "terms_content"]);
+    $config->name = "terms_content";
+    $config->code = "terms_content";
+    $config->value = $request->input("termsContent");
+    $config->save();
+
+    return redirect()
+      ->back()
+      ->with("success", "Cambios guardados");
   }
 
   public function costos()

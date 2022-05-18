@@ -4,9 +4,17 @@ import StoreLayout from "@/Layouts/StoreLayout";
 
 export default function Home(props) {
   return (
-    <StoreLayout auth={props.auth} errors={props.errors} categories={props.categories}>
-      <h1>NO ENCONTRADO</h1>
-      <p>Lo sentimos, la sección que está buscando no se encuentra.</p>
+    <StoreLayout
+      auth={props.auth}
+      errors={props.errors}
+      categories={props.categories}
+      cart={props.cart}
+      cartTotal={props.cartTotal}
+      cartSubtotal={props.cartSubtotal}
+      configs={props.configs}
+    >
+      <h1>Aviso de Privacidad</h1>
+      <div dangerouslySetInnerHTML={{ __html: props.configs.privacy_content.value }}></div>
     </StoreLayout>
   );
 }

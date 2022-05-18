@@ -68,6 +68,8 @@ Route::middleware(["auth"])
     Route::prefix("configuration")
       ->name("configuration.")
       ->group(function () {
+        Route::get("privacy", [ConfigurationController::class, "privacyShow"])->name("privacy");
+        Route::post("privacy", [ConfigurationController::class, "privacyUpdate"])->name("privacy.update");
         Route::get("costos", [ConfigurationController::class, "costos"])->name("costos");
         Route::post("costos", [ConfigurationController::class, "costosStore"])->name("costos.store");
         Route::get("social", [ConfigurationController::class, "social"])->name("social");
@@ -118,6 +120,14 @@ Route::name("store.")->group(function () {
   Route::get("/categoria/{categorySlug}", [StoreController::class, "showCategory"])->name("showCategory");
   Route::get("/{categorySlug}/{subcategorySlug}", [StoreController::class, "showSubcategory"])->name("showSubcategory");
   Route::get("/{categorySlug}/{subcategorySlug}/{productSlug}", [StoreController::class, "showProduct"])->name("showProduct");
+});
+
+Route::get("aviso-de-privacidad", function () {
+  return Inertia::render("Store/Privacy");
+});
+
+Route::get("terminos-y-condiciones", function () {
+  return Inertia::render("Store/Terms");
 });
 
 Route::get("404", [StoreController::class, "notFound"])->name("404");

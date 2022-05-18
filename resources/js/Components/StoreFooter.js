@@ -1,6 +1,7 @@
 import React from "react";
 import { faYoutube, faInstagram, faFacebookF } from "@fortawesome/free-brands-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { Link } from "@inertiajs/inertia-react";
 
 const Footer = () => {
   return (
@@ -20,14 +21,10 @@ const Footer = () => {
             </a>
           </li>
           <li>
-            <a className="" to="/privacidad">
-              Aviso de Privacidad
-            </a>
+            <Link href="/aviso-de-privacidad">Aviso de Privacidad</Link>
           </li>
           <li>
-            <a className="" to="/tyc">
-              Términos y Condiciones
-            </a>
+            <Link href="/terminos-y-condiciones">Términos y Condiciones</Link>
           </li>
         </ul>
       </div>

@@ -210,6 +210,11 @@
                                             <span class="nav-link-text">Redes Sociales</span>
                                         </a>
                                     </li>
+                                    <li>
+                                        <a href="{{route('admin.configuration.privacy')}}" title="Privacidad" data-filter-tags="privacidad">
+                                            <span class="nav-link-text">Privacidad</span>
+                                        </a>
+                                    </li>
                                 </ul>
                             </li>
                         </ul>
