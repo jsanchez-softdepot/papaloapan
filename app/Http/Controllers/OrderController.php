@@ -166,7 +166,7 @@ class OrderController extends Controller
       if (Auth::check()) {
         return redirect()->route("profile.account.index");
       } else {
-        return redirect()->url("/");
+        return redirect()->route('store.index');
       }
     } catch (Throwable $e) {
       DB::rollBack();

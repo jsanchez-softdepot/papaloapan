@@ -99,7 +99,7 @@ Route::name("profile.")
   });
 
 Route::name("store.")->group(function () {
-  Route::get("/", [StoreController::class, "index"]);
+  Route::get("/", [StoreController::class, "index"])->name('index');
 
   Route::get("products/search", [StoreController::class, "productSearch"]);
 

@@ -327,6 +327,34 @@ export default function CartPayment(props) {
 
               <strong className="block mb-2">Dirección de Facturación</strong>
 
+              <div className="lg:flex gap-4 items-center justify-between lg:mb-4">
+                <input
+                  type="text"
+                  className="border rounded px-4 py-2 text-sm flex-grow w-full mb-4 lg:mb-0"
+                  placeholder="Nombre de quien recibe"
+                  onChange={(e) => {
+                    setData("receiverName", e.target.value);
+                  }}
+                />
+                <input
+                  type="text"
+                  className="border rounded px-4 py-2 text-sm flex-grow w-full mb-4 lg:mb-0"
+                  placeholder="Teléfono de contacto"
+                  onChange={(e) => {
+                    setData("receiverPhone", e.target.value);
+                  }}
+                />
+                <input
+                  type="email"
+                  className="border rounded px-4 py-2 text-sm flex-grow w-full mb-4 lg:mb-0"
+                  placeholder="Correo Electrónico"
+                  onChange={(e) => {
+                    setData("receiverEmail", e.target.value);
+                  }}
+                />
+              </div>
+
+
               <div className="md:grid md:grid-cols-4 md:gap-4 mb-4">
                 <input
                   defaultValue={data.billingStreet}
