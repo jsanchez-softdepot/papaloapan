@@ -30,6 +30,7 @@ class Product extends Model implements HasMedia
     "created_by",
     "featured",
     "unit_id",
+    "temperaturas"
   ];
 
   public function unit()
