@@ -83,6 +83,7 @@ class UserController extends Controller
       $u->email = $request->input("email");
       $u->phone = $request->input("phone");
       $u->password = bcrypt($request->input("password"));
+      $u->send_notifications = $request->input('send_notifications') == "1" ? true : false;
       $u->save();
 
       $u->assignRole($request->input("role"));
@@ -93,16 +94,6 @@ class UserController extends Controller
     return redirect()->route("admin.users.index");
   }
 
-  /**
-   * Display the specified resource.
-   *
-   * @param  \App\Models\User  $user
-   * @return \Illuminate\Http\Response
-   */
-  public function show(User $user)
-  {
-    //
-  }
 
   /**
    * Show the form for editing the specified resource.
@@ -147,12 +138,13 @@ class UserController extends Controller
       ]);
 
       $user->update([
+        "is_admin" => $request->input('is_admin'),
         "name" => $request->input("name"),
         "lastname" => $request->input("lastname"),
         "phone" => $request->input("phone"),
         "email" => $request->input("email"),
         "password" => bcrypt($request->input("password")),
-        "send_notifications" => $user->send_notifications,
+        "send_notifications" => intval($request->input('send_notifications')),
       ]);
 
       if ($request->filled("password") && $request->filled("password_confirmation")) {
@@ -163,7 +155,7 @@ class UserController extends Controller
 
       $user->assignRole($request->input("role"));
 
-      return redirect()->back();
+      return redirect()->back()->with('flash',['success' => 'Información actualizada']);
     } else {
       return response("not authorized", 403);
     }

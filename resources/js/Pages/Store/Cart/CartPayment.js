@@ -194,31 +194,29 @@ export default function CartPayment(props) {
           <h3 className="font-bold text-xl mb-4">Forma de Envío</h3>
 
           <div className="border border-gray-400 mb-10 rounded">
-            <div className="border-b-2 p-4 flex gap-4 items-center">
-              <input
-                type="radio"
-                name="shipping_method"
-                value="DELIVERY"
-                onChange={(e) => {
-                  setData("shippingMethod", e.target.value);
-                }}
-              />
-              <FontAwesomeIcon className="w-6 h-6" icon={faTruck} />
-              <span className="block">Envío a domicilio Zona urbana de Boca del Río, Veracruz.</span>
-            </div>
-            <div className="p-4 flex gap-4 items-center">
-              <input
-                type="radio"
-                name="shipping_method"
-                value="PICKUP"
-                onChange={(e) => {
-                  setData("shippingMethod", e.target.value);
-                }}
-              />
-              <FontAwesomeIcon className="w-6 h-6" icon={faStore} />
-              <span className="block">Recoger en tienda</span>
-              <span className="block text-gray-500">Horario 8 a 16 horas de lunes a sábado</span>
-            </div>
+            { props.cartShipping?.shipping_method === 'DELIVERY' && (
+              <div className="border-b-2 p-4 flex gap-4 items-center">
+                <FontAwesomeIcon className="w-6 h-6" icon={faTruck} />
+                <div className="">
+                  <span className="block">Envío a domicilio Zona urbana de Boca del Río, Veracruz.</span>
+                  {/* <div>
+                    Av. Siempre Viva 123, Boca del Río, Veracruz
+                  </div> */}
+                </div>
+
+                <Link className={`ml-auto`} href={ route('store.cart.index') }>Cambiar</Link>
+              </div>
+            ) }
+
+            { props.cartShipping?.shipping_method === 'PICKUP' && (
+              <div className="p-4 flex gap-4 items-center">
+                <FontAwesomeIcon className="w-6 h-6" icon={faStore} />
+                <span className="block">Recoger en tienda</span>
+                <span className="block text-gray-500">Horario 8 a 16 horas de lunes a sábado</span>
+
+                <Link className={`ml-auto`} href={ route('store.cart.index') }>Cambiar</Link>
+              </div>
+            ) }
           </div>
 
           <h3 className="font-bold text-xl mb-2">Forma de Pago</h3>

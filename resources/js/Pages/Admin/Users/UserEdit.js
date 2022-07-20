@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import AdminLayout from "@/Layouts/AdminLayout";
 import { Inertia } from "@inertiajs/inertia";
 import { useForm } from "@inertiajs/inertia-react";
@@ -6,15 +6,31 @@ import toast from "react-hot-toast";
 
 export default function UserEdit(props) {
   const { patch, errors, data, setData, processing } = useForm({
-    name: props.user.name,
-    lastname: props.user.lastname,
-    email: props.user.email,
-    phone: props.user.phone,
-    is_admin: props.user.is_admin,
+    name: "",
+    lastname: "",
+    email: "",
+    phone: "",
+    is_admin: "0",
     password: "",
     password_confirmation: "",
-    role: props.user.roles[0].id,
+    role: "0",
+    send_notifications: "",
   });
+
+  useEffect(() => {
+    setData({
+      name: props.user.name,
+      lastname: props.user.lastname,
+      email: props.user.email,
+      phone: props.user.phone,
+      is_admin: props.user.is_admin,
+      password: "",
+      password_confirmation: "",
+      role: props.user.roles[0].id,
+      send_notifications: props.user.send_notifications,
+    })
+  }, []);
+
 
   const _handleSubmit = (e) => {
     e.preventDefault();
@@ -61,7 +77,7 @@ export default function UserEdit(props) {
                   <div className="row">
                     <div className="form-group col-md">
                       <label>Contraseña</label>
-                      <input type="text" className="form-control form-control-sm" value={data.password} onChange={(e) => setData("password", e.target.value)} required />
+                      <input type="text" className="form-control form-control-sm" value={data.password} onChange={(e) => setData("password", e.target.value)} />
                       {errors.password && <div>{errors.password}</div>}
                     </div>
                     <div className="form-group col-md">
@@ -72,7 +88,7 @@ export default function UserEdit(props) {
                         className="form-control form-control-sm"
                         value={data.password_confirmation}
                         onChange={(e) => setData("password_confirmation", e.target.value)}
-                        required
+
                       />
                       {errors.password_confirmation && <div>{errors.password_confirmation}</div>}
                     </div>
@@ -90,12 +106,19 @@ export default function UserEdit(props) {
                       <select id="role" className="form-control form-control-sm" value={data.role} onChange={(e) => setData("role", e.target.value)}>
                         <option value="0">Seleccione una opción</option>
                         {props.roles.map((role) => (
-                          <option key={role.id.toString()} value={data.role.id}>
+                          <option key={role.id.toString()} value={role.id}>
                             {role.name}
                           </option>
                         ))}
                       </select>
                       {errors.role && <div>{errors.role}</div>}
+                    </div>
+                    <div className="form-group col-md">
+                      <label>Enviar Notificaciones</label>
+                      <select className="form-control form-control-sm" value={data.send_notifications} onChange={(e) => setData("send_notifications", e.target.value)}>
+                        <option value="0">No</option>
+                        <option value="1">Sí</option>
+                      </select>
                     </div>
                   </div>
                   <div className="row mt-4">

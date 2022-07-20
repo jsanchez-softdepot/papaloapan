@@ -49,7 +49,9 @@ class PaymentController extends Controller
     } catch (Throwable $e) {
       Log::info($e);
 
-      return response($e->getMessage(), 500);
+      //return response($e->getMessage(), 500);
+
+      return redirect()->back()->with('flash',['error' => $e->getMessage()]);
     }
 
     return redirect()->back();

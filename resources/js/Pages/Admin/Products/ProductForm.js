@@ -73,7 +73,7 @@ export default function ProductForm({ isEditing = false, editId = null, editMode
       galleryFiles: [],
       featuredProduct: editModel.featured,
       featuredImageFile: "",
-      temperature: editModel.temperaturas,
+      temperature: editModel.temperature,
       productGalleryFiles: [],
       seoTitle: editModel.seo.title,
       seoDescription: editModel.seo.description,
@@ -195,9 +195,9 @@ export default function ProductForm({ isEditing = false, editId = null, editMode
                   <label>Temperatura</label>
                   <select name="temperature" className="form-control" value={data.temperature} onChange={_handleInputChange}>
                     <option value="No Aplica">No Aplica</option>
-                    <option value="Congelado">Congelado</option>
-                    <option value="Fresco">Fresco</option>
-                    <option value="Ambos">Congelado/Fresco</option>
+                    <option value="CONGELADO">Congelado</option>
+                    <option value="FRESCO">Fresco</option>
+                    <option value="AMBOS">Congelado/Fresco</option>
                   </select>
                 </div>
               </div>

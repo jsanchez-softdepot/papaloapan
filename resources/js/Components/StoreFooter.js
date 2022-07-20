@@ -11,12 +11,12 @@ const Footer = () => {
 
         <ul className="w-full md:flex flex-row justify-between items-center py-12 uppercase font-bold text-sm">
           <li>
-            <a target="_blank" className="" href="http://papaloapan.com.mx/2018/contacto/">
+            <a target="_blank" className="" href="https://www.papaloapan.com.mx/contacto/">
               Contacto
             </a>
           </li>
           <li>
-            <a className="" href="http://papaloapan.com.mx/2018/empresa/">
+            <a className="" href="https://www.papaloapan.com.mx/nosotros/">
               Empresa
             </a>
           </li>

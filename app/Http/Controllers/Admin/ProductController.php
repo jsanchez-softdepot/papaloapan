@@ -105,6 +105,7 @@ class ProductController extends Controller
         "created_by" => $request->user()->id,
         "featured" => intval($request->input("featuredProduct")),
         "unit_id" => \intval($request->input("unit")),
+        'temperaturas' => $request->input('temperature')
       ]);
 
       if ($request->has("seoTitle")) {
@@ -218,6 +219,7 @@ class ProductController extends Controller
         "subcategory_id" => $request->input("subcategoryId"),
         "created_by" => $request->user()->id,
         "featured" => intval($request->input("featuredProduct")),
+        'temperaturas' => $request->input('temperature')
       ]);
 
       if ($request->has("seoTitle")) {
